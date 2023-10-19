@@ -5,7 +5,7 @@ import '../../../helper/colors.dart';
 import '../../../helper/responsive_ui.dart';
 import '../../../widgets/custom_text.dart';
 import '../controllers/home_controller.dart';
-import 'custom_grid_view.dart';
+import 'custome_staggered_grid_view.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
@@ -66,8 +66,9 @@ class HomeView extends GetView<HomeController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CustomGridView(
+                  CustomStaggeredGridView(
                       count: controller.movieList.length,
+                      // count: controller.movieList.length,
                       childAspectRatio: 0.59,
                       crossAxisSpacing: ResponsiveUI().height(2),
                       mainAxisSpacing: ResponsiveUI().height(2),

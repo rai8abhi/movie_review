@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:intl/intl.dart';
-import 'package:movie_review/app/widgets/row_spacer.dart';
 
 import '../../../data/models/spiderman_search_model.dart' as model;
 import '../../../helper/app_assets.dart';
@@ -10,9 +9,10 @@ import '../../../helper/colors.dart';
 import '../../../helper/responsive_ui.dart';
 import '../../../widgets/ColumnSpacer.dart';
 import '../../../widgets/custom_text.dart';
+import '../../../widgets/row_spacer.dart';
 
-class CustomGridView extends GetView {
-  const CustomGridView({
+class CustomStaggeredGridView extends GetView {
+  const CustomStaggeredGridView({
     Key? key,
     //required this.child,
     required this.count,
@@ -36,6 +36,34 @@ class CustomGridView extends GetView {
   final bool showBanner;
 
   @override
+  // Widget build(BuildContext context) {
+  //   return Container(
+  //     decoration: const BoxDecoration(
+  //       color: AppColors.primaryColor,
+  //       borderRadius: BorderRadius.all(
+  //         Radius.circular(5),
+  //       ),
+  //     ),
+  //     child: GridView.builder(
+  //       padding: EdgeInsets.zero,
+  //       scrollDirection: Axis.vertical,
+  //       physics: const BouncingScrollPhysics(),
+  //       shrinkWrap: true,
+  //       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //         crossAxisCount: 2,
+  //         childAspectRatio: childAspectRatio, //2 / 2,
+  //         crossAxisSpacing: crossAxisSpacing, // 10,
+  //         mainAxisSpacing: mainAxisSpacing, //10,),
+  //       ),
+  //       itemCount: count,
+  //       itemBuilder: (BuildContext ctx, index) {
+  //         return Obx(
+  //           () => _gridRowView(index, ctx),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -44,30 +72,50 @@ class CustomGridView extends GetView {
           Radius.circular(5),
         ),
       ),
-      child: GridView.builder(
-        // padding: EdgeInsets.fromLTRB(
-        //     0, ResponsiveUI().height(1), 0, ResponsiveUI().height(1)),
-        padding: EdgeInsets.zero,
+      child: GridView.custom(
         scrollDirection: Axis.vertical,
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverWovenGridDelegate.count(
           crossAxisCount: 2,
-          childAspectRatio: childAspectRatio, //2 / 2,
-          crossAxisSpacing: crossAxisSpacing, // 10,
-          mainAxisSpacing: mainAxisSpacing, //10,),
+          mainAxisSpacing: 2,
+          crossAxisSpacing: 2,
+          pattern: [
+            const WovenGridTile(0.65),
+            const WovenGridTile(
+              5 / 7,
+              crossAxisRatio: 1,
+              alignment: AlignmentDirectional.topCenter,
+            ),
+          ],
         ),
-        itemCount: count,
-        itemBuilder: (BuildContext ctx, index) {
-          return Obx(
-            () => _gridRowView(index, ctx),
-          );
-        },
+        childrenDelegate: SliverChildBuilderDelegate(
+          childCount: count,
+          (context, index) => _gridRowView(index),
+        ),
       ),
+      // child: GridView.builder(
+      //   padding: EdgeInsets.zero,
+      //   scrollDirection: Axis.vertical,
+      //   physics: const BouncingScrollPhysics(),
+      //   shrinkWrap: true,
+      //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      //     crossAxisCount: 2,
+      //     childAspectRatio: childAspectRatio, //2 / 2,
+      //     crossAxisSpacing: crossAxisSpacing, // 10,
+      //     mainAxisSpacing: mainAxisSpacing, //10,),
+      //   ),
+      //   itemCount: count,
+      //   itemBuilder: (BuildContext ctx, index) {
+      //     return Obx(
+      //       () => _gridRowView(index, ctx),
+      //     );
+      //   },
+      // ),
     );
   }
 
-  _gridRowView(int index, BuildContext ctx) {
+  _gridRowView(int index) {
     return InkWell(
       onTap: () {
         onGridItemTap(index);
@@ -75,17 +123,20 @@ class CustomGridView extends GetView {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            // margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),
-            decoration: const BoxDecoration(
-              color: AppColors.primaryColor,
+          Expanded(
+            child: Container(
+              // height: ResponsiveUI().height(0),
+              // margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryColor,
+              ),
+              padding: EdgeInsets.only(
+                  left: ResponsiveUI().width(1.5),
+                  top: ResponsiveUI().width(1.5),
+                  right: ResponsiveUI().width(1.5),
+                  bottom: ResponsiveUI().width(1.5)),
+              child: _imageView(index),
             ),
-            padding: EdgeInsets.only(
-                left: ResponsiveUI().width(1.5),
-                top: ResponsiveUI().width(1.5),
-                right: ResponsiveUI().width(1.5),
-                bottom: ResponsiveUI().width(1.5)),
-            child: _imageView(index),
           ),
           ColumnSpacer(value: ResponsiveUI().width(0.5)),
           Row(
@@ -129,7 +180,7 @@ class CustomGridView extends GetView {
       borderRadius: BorderRadius.circular(20),
       child: Image.network(
         "${items[index].show!.image!.medium}",
-        fit: BoxFit.cover,
+        fit: BoxFit.fill,
         errorBuilder:
             (BuildContext context, Object exception, StackTrace? stackTrace) {
           return Image.asset(
